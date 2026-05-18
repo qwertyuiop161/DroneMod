@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "group": "propeller",
+  "key": {
+    "l": "minecraft:iron_chain",
+    "w": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "wlw",
+    "wlw",
+    " l "
+  ],
+  "result": {
+    "id": "craftable-drones:propeller"
+  }
+}

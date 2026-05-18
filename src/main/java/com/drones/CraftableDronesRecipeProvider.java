@@ -45,7 +45,7 @@ public class CraftableDronesRecipeProvider extends FabricRecipeProvider {
                 shaped(RecipeCategory.TOOLS, ModItems.PROPELLER, 1)
                     .pattern("wlw")
                     .pattern("wlw")
-                    .pattern("l")
+                    .pattern(" l ")
                     .define('w', Items.IRON_INGOT)
                     .define('l', Items.IRON_CHAIN)
                     .group("propeller")

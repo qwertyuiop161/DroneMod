@@ -1,6 +1,8 @@
 package com.drones;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,5 +16,8 @@ public class CraftableDrones implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModItems.registerModItems();
+		ModEntityModelLayers.registerModelLayers();
+		FabricDefaultAttributeRegistry.register(ModEntityTypes.DRONE, DroneEntity.createCubeAttributes());
+		EntityRenderers.register(ModEntityTypes.DRONE, DroneEntityRenderer::new);
 	}
 }
