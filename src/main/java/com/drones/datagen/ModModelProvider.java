@@ -23,6 +23,8 @@ public class ModModelProvider extends FabricModelProvider{
     public void generateItemModels(ItemModelGenerators itemModelGenerators) {
         itemModelGenerators.generateFlatItem(ModItems.BATTERY, ModelTemplates.FLAT_ITEM);
         itemModelGenerators.generateFlatItem(ModItems.PROPELLER, ModelTemplates.FLAT_ITEM);
+        itemModelGenerators.generateFlatItem(ModItems.DRONE_ITEM, ModelTemplates.FLAT_ITEM);
+        itemModelGenerators.generateFlatItem(ModItems.DRONE_CONTROLLER, ModelTemplates.FLAT_ITEM);
     }
     
 }

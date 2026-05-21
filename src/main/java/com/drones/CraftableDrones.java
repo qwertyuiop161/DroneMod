@@ -18,6 +18,7 @@ public class CraftableDrones implements ModInitializer {
 		ModItems.registerModItems();
 		ModEntityModelLayers.registerModelLayers();
 		FabricDefaultAttributeRegistry.register(ModEntityTypes.DRONE, DroneEntity.createCubeAttributes());
+		ModDataComponentTypes.register();
 		EntityRenderers.register(ModEntityTypes.DRONE, DroneEntityRenderer::new);
 	}
 }

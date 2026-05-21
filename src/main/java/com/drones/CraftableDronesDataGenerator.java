@@ -11,5 +11,6 @@ public class CraftableDronesDataGenerator implements DataGeneratorEntrypoint {
 		FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 		pack.addProvider(ModModelProvider::new);
 		pack.addProvider(CraftableDronesRecipeProvider::new);
+		pack.addProvider(ModLootTableProvider::new);
 	}
 }
