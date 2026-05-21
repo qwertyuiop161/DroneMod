@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "group": "camera",
+  "key": {
+    "g": "minecraft:glass",
+    "k": "minecraft:redstone",
+    "l": "minecraft:iron_ingot",
+    "n": "minecraft:spyglass",
+    "w": "minecraft:observer"
+  },
+  "pattern": [
+    "lwl",
+    "kgk",
+    "lnl"
+  ],
+  "result": {
+    "id": "craftable-drones:camera"
+  }
+}

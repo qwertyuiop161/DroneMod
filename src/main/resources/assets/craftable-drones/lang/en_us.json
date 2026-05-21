@@ -2,5 +2,6 @@
     "item.craftable-drones.battery": "Drone battery",
     "item.craftable-drones.propeller": "Propellers",
     "item.craftable-drones.drone_item": "Drone",
-    "item.craftable-drones.drone_controller": "Drone controller (right click to link)"
+    "item.craftable-drones.drone_controller": "Drone controller",
+    "item.craftable-drones.camera": "Camera"
 }

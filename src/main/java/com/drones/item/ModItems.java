@@ -20,6 +20,7 @@ public class ModItems {
     public static final Item PROPELLER = registerItem("propeller", Item::new,new Item.Properties());
     public static final Item DRONE_ITEM = registerItem("drone_item", SpawnEggItem::new, new Item.Properties().spawnEgg(ModEntityTypes.DRONE));
     public static final Item DRONE_CONTROLLER = registerItem("drone_controller", DroneControllerItem::new, new Item.Properties().stacksTo(1));
+    public static final Item CAMERA = registerItem("camera", Item::new, new Item.Properties());
     public static <T extends Item> T registerItem(String name, Function<Item.Properties, T> function, Item.Properties settings) {
         ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(CraftableDrones.MOD_ID, name));
 
@@ -30,9 +31,12 @@ public class ModItems {
 		return item;
     }
     public static void registerModItems() {
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(output -> {
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(output -> {
             output.accept(BATTERY);
             output.accept(PROPELLER);
+            output.accept(DRONE_ITEM);
+            output.accept(DRONE_CONTROLLER);
+            output.accept(CAMERA);
         });
     }
 

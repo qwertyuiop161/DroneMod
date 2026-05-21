@@ -14,6 +14,7 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 
 public class CraftableDronesRecipeProvider extends FabricRecipeProvider {
 
@@ -42,7 +43,7 @@ public class CraftableDronesRecipeProvider extends FabricRecipeProvider {
                     .group("battery")
                     .unlockedBy(getHasName(Items.REDSTONE), has(Items.REDSTONE))
                     .save(output);
-                shaped(RecipeCategory.TOOLS, ModItems.PROPELLER, 1)
+                shaped(RecipeCategory.REDSTONE, ModItems.PROPELLER, 1)
                     .pattern("wlw")
                     .pattern("wlw")
                     .pattern(" l ")
@@ -51,7 +52,18 @@ public class CraftableDronesRecipeProvider extends FabricRecipeProvider {
                     .group("propeller")
                     .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                     .save(output);
-
+                shaped(RecipeCategory.REDSTONE, ModItems.CAMERA, 1)
+                    .pattern("lwl")
+                    .pattern("kgk")
+                    .pattern("lnl")
+                    .define('w', Items.OBSERVER)
+                    .define('l', Items.IRON_INGOT)
+                    .define('k', Items.REDSTONE)
+                    .define('g', Items.GLASS)
+                    .define('n', Items.SPYGLASS)
+                    .group("camera")
+                    .unlockedBy(getHasName(Items.REDSTONE), has(Items.REDSTONE))
+                    .save(output);
             }
         };
     }
