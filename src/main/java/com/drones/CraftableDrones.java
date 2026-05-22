@@ -1,6 +1,8 @@
 package com.drones;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 
@@ -20,5 +22,7 @@ public class CraftableDrones implements ModInitializer {
 		FabricDefaultAttributeRegistry.register(ModEntityTypes.DRONE, DroneEntity.createCubeAttributes());
 		ModDataComponentTypes.register();
 		EntityRenderers.register(ModEntityTypes.DRONE, DroneEntityRenderer::new);
+		PayloadTypeRegistry.serverboundPlay().register(DroneControlPacket.TYPE, DroneControlPacket.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(DroneControlPacket.TYPE, DroneControlPacket::handle);
 	}
 }

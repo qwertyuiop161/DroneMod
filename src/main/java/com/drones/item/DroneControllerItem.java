@@ -2,7 +2,6 @@ package com.drones.item;
 
 import com.drones.DroneEntity;
 import com.drones.ModDataComponentTypes;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -24,14 +23,21 @@ public class DroneControllerItem extends Item {
 
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
+        if (hand !=InteractionHand.MAIN_HAND) return InteractionResult.PASS;
         if (player.level().isClientSide()) return InteractionResult.SUCCESS;
         if (!(target instanceof DroneEntity drone)) return InteractionResult.PASS;
 
         ItemStack realStack = player.getItemInHand(hand);
 
         UUID existing = realStack.get(ModDataComponentTypes.LINKED_DRONE_UUID);
-        if (existing != null) {
-            player.sendSystemMessage(Component.literal("Already linked! Sneak+use to detach."));
+        if (existing != null&&existing.equals(drone.getUUID())) {
+            realStack.remove(ModDataComponentTypes.LINKED_DRONE_UUID);
+            drone.clearLink();
+            player.sendSystemMessage(Component.literal("Drone unlinked!"));
+            return InteractionResult.SUCCESS;
+        }
+        if (existing!=null) {
+            player.sendSystemMessage(Component.literal("Already Linked to a drone!"));
             return InteractionResult.FAIL;
         }
         if (drone.isLinked()) {
@@ -42,13 +48,16 @@ public class DroneControllerItem extends Item {
         realStack.set(ModDataComponentTypes.LINKED_DRONE_UUID, drone.getUUID());
         drone.setLinkedController(player.getUUID());
         player.sendSystemMessage(Component.literal("Drone linked!"));
+        player.sendSystemMessage(Component.literal("Controls: R = enter/exit control mode | Arrow keys = move | PgUp/PgDn = up/down | HOME = toggle direction mode | END = lock direction | Right-click drone = unlink"));
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
 
         UUID linkedUUID = stack.get(ModDataComponentTypes.LINKED_DRONE_UUID);
         if (linkedUUID == null) {
@@ -60,13 +69,7 @@ public class DroneControllerItem extends Item {
 
         Entity found = serverLevel.getEntity(linkedUUID);
         if (found instanceof DroneEntity drone) {
-            if (player.isShiftKeyDown()) {
-                drone.triggerExplosion();
-                stack.remove(ModDataComponentTypes.LINKED_DRONE_UUID);
-                player.sendSystemMessage(Component.literal("Drone detonated!"));
-            } else {
-                player.sendSystemMessage(Component.literal("Drone at: " + drone.blockPosition()));
-            }
+            player.sendSystemMessage(Component.literal("Drone at: " + drone.blockPosition()));
         } else {
             stack.remove(ModDataComponentTypes.LINKED_DRONE_UUID);
             player.sendSystemMessage(Component.literal("Linked drone not found. Link cleared."));

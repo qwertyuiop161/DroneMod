@@ -20,6 +20,9 @@
 		],
 		"fabric-datagen": [
 			"com.drones.CraftableDronesDataGenerator"
+		],
+		"client": [
+			"com.drones.DroneControllerClient"
 		]
 	},
 	"mixins": [
