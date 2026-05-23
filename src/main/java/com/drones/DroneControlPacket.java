@@ -39,10 +39,15 @@ public record DroneControlPacket(float dx, float dy, float dz, float yaw, float 
             if (linkedUUID==null) return;
             Entity entity = player.level().getEntity(linkedUUID);
             if (!(entity instanceof DroneEntity drone)) return;
+            if (!drone.isLinked()) {
+                drone.setControlled(false);
+                return;
+            }
             if(packet.exit()) {
                 drone.setControlled(false);
                 return;
             }
+
             Vec3 movement = new Vec3(packet.dx(), packet.dy(), packet.dz()).scale(0.3);
             Vec3 current = drone.position();
             Vec3 target = current.add(movement);

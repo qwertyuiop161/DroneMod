@@ -76,6 +76,7 @@ public class DroneEntity extends PathfinderMob {
         if (isControlled()) {
             this.setDeltaMovement(Vec3.ZERO);
             this.fallDistance=0;
+            this.setNoGravity(true);
         } else {
             this.fallDistance = 0;
             if (!this.onGround()) {
@@ -91,5 +92,12 @@ public class DroneEntity extends PathfinderMob {
     }
     public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
         return false;
+    }
+    @Override
+    public void remove(RemovalReason reason) {
+        if (!level().isClientSide()) {
+            setControlled(false);
+        }
+        super.remove(reason);
     }
 }

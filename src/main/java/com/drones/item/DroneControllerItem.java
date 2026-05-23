@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -76,5 +77,17 @@ public class DroneControllerItem extends Item {
         }
 
         return InteractionResult.SUCCESS;
+    }
+    @Override
+    public void onDestroyed(ItemEntity itemEntity) {
+        ItemStack stack = itemEntity.getItem();
+        UUID linkedUUID = stack.get(ModDataComponentTypes.LINKED_DRONE_UUID);
+        if (linkedUUID==null) return;
+        if (!(itemEntity.level() instanceof ServerLevel serverLevel)) return;
+        Entity found = serverLevel.getEntity(linkedUUID);
+        if (found instanceof DroneEntity drone) {
+            drone.setControlled(false);
+            drone.clearLink();
+        }
     }
 }
