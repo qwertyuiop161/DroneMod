@@ -16,7 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 
 public class ModItems {
-    public static final Item BATTERY = registerItem("battery", Item::new,new Item.Properties());
+    public static final Item BATTERY = registerItem("battery", Item::new,new Item.Properties().durability(1000));
     public static final Item PROPELLER = registerItem("propeller", Item::new,new Item.Properties());
     public static final Item DRONE_ITEM = registerItem("drone_item", SpawnEggItem::new, new Item.Properties().spawnEgg(ModEntityTypes.DRONE));
     public static final Item DRONE_CONTROLLER = registerItem("drone_controller", DroneControllerItem::new, new Item.Properties().stacksTo(1));

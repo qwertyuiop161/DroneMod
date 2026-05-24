@@ -30,7 +30,6 @@ public class ModLootTableProvider extends SimpleFabricLootTableSubProvider {
                 LootTable.lootTable()
                         .withPool(LootPool.lootPool()
                                 .setRolls(ConstantValue.exactly(1))
-                                .add(LootItem.lootTableItem(ModItems.DRONE_ITEM))
-                                .when(LootItemKilledByPlayerCondition.killedByPlayer()))));
+                                .add(LootItem.lootTableItem(ModItems.DRONE_ITEM)))));
     }
 }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "group": "drone",
+  "key": {
+    "b": "craftable-drones:battery",
+    "c": "craftable-drones:camera",
+    "i": "minecraft:iron_ingot",
+    "p": "craftable-drones:propeller",
+    "r": "minecraft:redstone"
+  },
+  "pattern": [
+    "pbp",
+    "rcr",
+    "pip"
+  ],
+  "result": {
+    "id": "craftable-drones:drone_item"
+  }
+}

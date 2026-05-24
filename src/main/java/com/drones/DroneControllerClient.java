@@ -22,6 +22,7 @@ public class DroneControllerClient implements ClientModInitializer {
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.level == null) return;
+            if (client.screen!=null) return;
             LocalPlayer player = client.player;
             if (!inControlMode) {
                 boolean hasLinked= false;

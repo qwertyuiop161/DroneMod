@@ -64,6 +64,19 @@ public class CraftableDronesRecipeProvider extends FabricRecipeProvider {
                     .group("camera")
                     .unlockedBy(getHasName(Items.REDSTONE), has(Items.REDSTONE))
                     .save(output);
+                shaped(RecipeCategory.REDSTONE, ModItems.DRONE_ITEM)
+                    .pattern("pbp")
+                    .pattern("rcr")
+                    .pattern("pip")
+                    .define('p', ModItems.PROPELLER)
+                    .define('b', ModItems.BATTERY)
+                    .define('r', Items.REDSTONE)
+                    .define('c', ModItems.CAMERA)
+                    .define('i', Items.IRON_INGOT)
+                    .group("drone")
+                    .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                    .save(output);
+
             }
         };
     }

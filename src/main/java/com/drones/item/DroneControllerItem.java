@@ -27,6 +27,10 @@ public class DroneControllerItem extends Item {
         if (hand !=InteractionHand.MAIN_HAND) return InteractionResult.PASS;
         if (player.level().isClientSide()) return InteractionResult.SUCCESS;
         if (!(target instanceof DroneEntity drone)) return InteractionResult.PASS;
+        if (!drone.hasBattery()) {
+            player.sendSystemMessage(Component.literal("Drone has no battery, insert one to use"));
+            return InteractionResult.FAIL;
+        }
 
         ItemStack realStack = player.getItemInHand(hand);
 
