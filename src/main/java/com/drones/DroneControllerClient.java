@@ -99,14 +99,25 @@ public class DroneControllerClient implements ClientModInitializer {
             else if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT)==GLFW.GLFW_PRESS)dx=-1;
             if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_PAGE_UP)==GLFW.GLFW_PRESS)dy=1;
             if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_PAGE_DOWN)==GLFW.GLFW_PRESS)dy=-1;
-            if (dx!=0||dy!=0||dz!=0) {
-                float yaw = (float) Math.toRadians(relativeMode?player.getYRot():lockedYaw);
-                float rdx = (float) (dx*Math.cos(yaw)-dz*Math.sin(yaw));
-                float rdz = (float) (dx*Math.sin(yaw)+dz*Math.cos(yaw));
-                ClientPlayNetworking.send(new DroneControlPacket(rdx, dy, rdz, player.getYRot(), player.getXRot(), false));
+            float sendYaw, sendPitch;
+            if (inCameraMode && cameraModeA) {
+                sendYaw = lockedCameraYaw;
+                sendPitch = lockedCameraPitch;
+            } else if (inCameraMode && !cameraModeA) {
+                sendYaw = player.getYRot();
+                sendPitch = player.getXRot();
+                player.setYRot(lockedCameraYaw);
+                player.setXRot(lockedCameraPitch);
+                player.yRotO = lockedCameraYaw;
+                player.xRotO = lockedCameraPitch;
             } else {
-                ClientPlayNetworking.send(new DroneControlPacket(0, 0, 0, player.getYRot(), player.getXRot(), false));
+                sendYaw = player.getYRot();
+                sendPitch = player.getXRot();
             }
+            float yaw = (float) Math.toRadians(relativeMode ? player.getYRot() : lockedYaw);
+            float rdx = (float) (dx*Math.cos(yaw)-dz*Math.sin(yaw));
+            float rdz = (float) (dx*Math.sin(yaw)+dz*Math.cos(yaw));
+            ClientPlayNetworking.send(new DroneControlPacket(rdx, dy, rdz, sendYaw, sendPitch, false));
         });
     }
     public static void enterControlMode() {
@@ -134,8 +145,12 @@ public class DroneControllerClient implements ClientModInitializer {
             if (droneUUID == null) { inCameraMode = false; return; }
             for (Entity e : mc.level.entitiesForRendering()) {
                 if (e instanceof DroneEntity drone && drone.getUUID().equals(droneUUID)) {
+                    activeDrone = drone;
+                    lockedCameraYaw = drone.getYRot();
+                    lockedCameraPitch = drone.getXRot();
+                    cameraModeA = true;
                     mc.setCameraEntity(drone);
-                    mc.player.sendSystemMessage(Component.literal("[Drone] Camera ON - Shift+right-click to exit"));
+                    mc.player.sendSystemMessage(Component.literal("[Drone] Camera ON (Mode A) - F to switch modes, Shift+right-click to exit"));
                     return;
                 }
             }
@@ -148,6 +163,7 @@ public class DroneControllerClient implements ClientModInitializer {
     public static void exitCameraMode() {
         if (inCameraMode) {
             inCameraMode=false;
+            activeDrone=null;
             Minecraft.getInstance().setCameraEntity(Minecraft.getInstance().player);
         }
     }
