@@ -1,9 +1,11 @@
 package com.drones.item;
 
+import com.drones.DroneControllerClient;
 import com.drones.DroneEntity;
 import com.drones.ModDataComponentTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -27,10 +29,7 @@ public class DroneControllerItem extends Item {
         if (hand !=InteractionHand.MAIN_HAND) return InteractionResult.PASS;
         if (player.level().isClientSide()) return InteractionResult.SUCCESS;
         if (!(target instanceof DroneEntity drone)) return InteractionResult.PASS;
-        if (!drone.hasBattery()) {
-            player.sendSystemMessage(Component.literal("Drone has no battery, insert one to use"));
-            return InteractionResult.FAIL;
-        }
+        
 
         ItemStack realStack = player.getItemInHand(hand);
 
@@ -61,17 +60,18 @@ public class DroneControllerItem extends Item {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (level.isClientSide()) {
+            if (player.isShiftKeyDown() && stack.get(ModDataComponentTypes.LINKED_DRONE_UUID) != null) {
+                DroneControllerClient.toggleCameraMode();
+            }
             return InteractionResult.SUCCESS;
         }
-
+        if (player.isShiftKeyDown()) return InteractionResult.SUCCESS;
         UUID linkedUUID = stack.get(ModDataComponentTypes.LINKED_DRONE_UUID);
-        if (linkedUUID == null) {
-            player.sendSystemMessage(Component.literal("No drone linked. Right-click a drone to link."));
+        if (linkedUUID==null) {
+            player.sendSystemMessage(Component.literal("No Drone linked, right click a drone"));
             return InteractionResult.FAIL;
         }
-
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.PASS;
-
         Entity found = serverLevel.getEntity(linkedUUID);
         if (found instanceof DroneEntity drone) {
             player.sendSystemMessage(Component.literal("Drone at: " + drone.blockPosition()));
@@ -79,7 +79,6 @@ public class DroneControllerItem extends Item {
             stack.remove(ModDataComponentTypes.LINKED_DRONE_UUID);
             player.sendSystemMessage(Component.literal("Linked drone not found. Link cleared."));
         }
-
         return InteractionResult.SUCCESS;
     }
     @Override
@@ -92,6 +91,11 @@ public class DroneControllerItem extends Item {
         if (found instanceof DroneEntity drone) {
             drone.setControlled(false);
             drone.clearLink();
+            for (Player p : serverLevel.players()) {
+                if (p instanceof ServerPlayer sp && sp.getCamera() == drone) {
+                    sp.setCamera(sp);
+                }
+            }
         }
     }
 }

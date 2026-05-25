@@ -1,5 +1,7 @@
 package com.drones;
 
+import java.util.UUID;
+
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -8,6 +10,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -17,7 +20,13 @@ public class DroneControllerClient implements ClientModInitializer {
     private static boolean homeWasPressed = false; 
     private static float lockedYaw = 0f;
     private static boolean rWasPressed = false;
+    private static boolean inCameraMode = false;
     private static boolean endWasPressed = false;
+    private static boolean fWasPressed = false;
+    private static boolean cameraModeA = true;
+    private static float lockedCameraYaw = 0f;
+    private static float lockedCameraPitch = 0f;
+    private static DroneEntity activeDrone = null;
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -34,7 +43,11 @@ public class DroneControllerClient implements ClientModInitializer {
                         break;
                     }
                 }
-                if (!hasLinked) return;
+                if (!hasLinked) {
+                    if(inCameraMode)
+                        exitCameraMode();
+                    return;
+                }
             }
             long window = Minecraft.getInstance().getWindow().handle();
             boolean rNowPressed = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_R) == GLFW.GLFW_PRESS;
@@ -46,6 +59,22 @@ public class DroneControllerClient implements ClientModInitializer {
                 }
             }
             rWasPressed=rNowPressed;
+            boolean fNowPressed = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_F) == GLFW.GLFW_PRESS;
+            if (fNowPressed && !fWasPressed && inCameraMode) {
+                cameraModeA = !cameraModeA;
+                if (cameraModeA) {
+                    if (activeDrone != null) {
+                        lockedCameraYaw=activeDrone.getYRot();
+                        lockedCameraPitch=activeDrone.getXRot();
+                    }
+                    player.sendSystemMessage(Component.literal("[Drone] Camera Mode A - free head, locked drone"));
+                } else {
+                    lockedCameraYaw = player.getYRot();
+                    lockedCameraPitch=player.getXRot();
+                    player.sendSystemMessage(Component.literal("camera mode b, locked head, free drone"));
+                }
+            }
+            fWasPressed=fNowPressed;
             if (!inControlMode) return;
             boolean homePressed = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_HOME) == GLFW.GLFW_PRESS;
             if (homePressed&&!homeWasPressed) {
@@ -88,6 +117,7 @@ public class DroneControllerClient implements ClientModInitializer {
     }
     public static void exitControlMode(Minecraft client) {
         inControlMode=false;
+        exitCameraMode();
         ClientPlayNetworking.send(new DroneControlPacket(0, 0, 0, 0,0,true));
         if (client.player!=null) {
             client.player.sendSystemMessage(Component.literal("[Drone] Control mode OFF"));
@@ -96,5 +126,32 @@ public class DroneControllerClient implements ClientModInitializer {
     public static boolean isInControlMod() {
         return inControlMode;
     }
-    
+    public static void toggleCameraMode() {
+        inCameraMode=!inCameraMode;
+        Minecraft mc = Minecraft.getInstance();
+        if (inCameraMode) {
+            UUID droneUUID = mc.player.getMainHandItem().get(ModDataComponentTypes.LINKED_DRONE_UUID);
+            if (droneUUID == null) { inCameraMode = false; return; }
+            for (Entity e : mc.level.entitiesForRendering()) {
+                if (e instanceof DroneEntity drone && drone.getUUID().equals(droneUUID)) {
+                    mc.setCameraEntity(drone);
+                    mc.player.sendSystemMessage(Component.literal("[Drone] Camera ON - Shift+right-click to exit"));
+                    return;
+                }
+            }
+            inCameraMode = false;
+        } else {
+            mc.setCameraEntity(mc.player);
+            mc.player.sendSystemMessage(Component.literal("[Drone] Camera OFF"));
+        }
+    }
+    public static void exitCameraMode() {
+        if (inCameraMode) {
+            inCameraMode=false;
+            Minecraft.getInstance().setCameraEntity(Minecraft.getInstance().player);
+        }
+    }
+    public static boolean isInCameraMode() {
+        return inCameraMode;
+    }
 }

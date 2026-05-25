@@ -4,6 +4,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -124,12 +125,16 @@ public class DroneEntity extends PathfinderMob {
     @Override
     public void tick() {
         if (isControlled()) {
-            this.setDeltaMovement(Vec3.ZERO);
-            this.fallDistance=0;
             this.setNoGravity(true);
+            this.setDeltaMovement(Vec3.ZERO);
+            this.fallDistance = 0;
         }
         super.tick();
-        if (!isControlled()) {
+        if (isControlled()) {
+            this.setNoGravity(true);
+            this.setDeltaMovement(Vec3.ZERO);
+            this.fallDistance = 0;
+        } else {
             this.setNoGravity(false);
             this.fallDistance = 0;
             if (!this.onGround()) {
@@ -144,17 +149,29 @@ public class DroneEntity extends PathfinderMob {
     public void remove(RemovalReason reason) {
         if (!level().isClientSide()) {
             setControlled(false);
+            for (Player p : level().players()) {
+                if (p instanceof ServerPlayer sp) {
+                    if (sp.getCamera()==this) {
+                        sp.setCamera(sp);
+                        sp.sendSystemMessage(Component.literal("[Drone] Camera OFF - drone destroyed"));
+                    }
+                }
+            }
         }
         super.remove(reason);
     }
-    public void saveAdditionalSaveData(ValueOutput output) {
+    @Override
+    public boolean save(ValueOutput output) {
         super.save(output);
         output.putBoolean("HasBattery", hasBattery());
         if (hasBattery() && !insertedBattery.isEmpty()) {
             output.store("InsertedBattery", ItemStack.CODEC, insertedBattery);
         }
+        output.putString("LinkedController", entityData.get(LINKED_CONTROLLER));
+        return true;
     }
-    public void loadAdditionalSaveData(ValueInput input) {
+    @Override
+    public void load(ValueInput input) {
         super.load(input);
         setBattery(input.getBooleanOr("HasBattery", true));
         input.read("InsertedBattery", ItemStack.CODEC).ifPresent(stack -> insertedBattery=stack);

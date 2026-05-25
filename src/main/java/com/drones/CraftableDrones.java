@@ -24,5 +24,7 @@ public class CraftableDrones implements ModInitializer {
 		EntityRenderers.register(ModEntityTypes.DRONE, DroneEntityRenderer::new);
 		PayloadTypeRegistry.serverboundPlay().register(DroneControlPacket.TYPE, DroneControlPacket.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(DroneControlPacket.TYPE, DroneControlPacket::handle);
+		PayloadTypeRegistry.serverboundPlay().register(DroneCameraPacket.TYPE, DroneCameraPacket.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(DroneCameraPacket.TYPE, DroneCameraPacket::handle);
 	}
 }
