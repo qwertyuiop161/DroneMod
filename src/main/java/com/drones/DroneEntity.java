@@ -5,6 +5,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -140,6 +142,12 @@ public class DroneEntity extends PathfinderMob {
             if (!this.onGround()) {
                 this.setDeltaMovement(this.getDeltaMovement().x*0.5, -0.1, this.getDeltaMovement().z*0.5);
             }
+        }
+        if (this.isInWater()) {
+            this.hurt(this.damageSources().drown(), 20.0f/140.0f);
+        }
+        if (isControlled() && this.tickCount%5==0 && !level().isClientSide()) {
+            level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.BEEHIVE_WORK, SoundSource.NEUTRAL, 0.5f, 1.5f);
         }
     }
     public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {

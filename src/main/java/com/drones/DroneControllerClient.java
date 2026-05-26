@@ -7,6 +7,7 @@ import org.lwjgl.glfw.GLFW;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -106,10 +107,6 @@ public class DroneControllerClient implements ClientModInitializer {
             } else if (inCameraMode && !cameraModeA) {
                 sendYaw = player.getYRot();
                 sendPitch = player.getXRot();
-                player.setYRot(lockedCameraYaw);
-                player.setXRot(lockedCameraPitch);
-                player.yRotO = lockedCameraYaw;
-                player.xRotO = lockedCameraPitch;
             } else {
                 sendYaw = player.getYRot();
                 sendPitch = player.getXRot();
@@ -149,7 +146,7 @@ public class DroneControllerClient implements ClientModInitializer {
                     lockedCameraYaw = drone.getYRot();
                     lockedCameraPitch = drone.getXRot();
                     cameraModeA = true;
-                    mc.setCameraEntity(drone);
+                    mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     mc.player.sendSystemMessage(Component.literal("[Drone] Camera ON (Mode A) - F to switch modes, Shift+right-click to exit"));
                     return;
                 }
@@ -164,10 +161,22 @@ public class DroneControllerClient implements ClientModInitializer {
         if (inCameraMode) {
             inCameraMode=false;
             activeDrone=null;
-            Minecraft.getInstance().setCameraEntity(Minecraft.getInstance().player);
+            Minecraft.getInstance().options.setCameraType(CameraType.FIRST_PERSON);
         }
     }
     public static boolean isInCameraMode() {
         return inCameraMode;
+    }
+    public static DroneEntity getActiveDrone() {
+        return activeDrone;
+    }
+    public static boolean isCameraModeA() {
+        return cameraModeA;
+    }
+    public static float getLockedCameraYaw() {
+        return lockedCameraYaw;
+    }
+    public static float getLockedCameraPitch() {
+        return lockedCameraPitch;
     }
 }
