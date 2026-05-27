@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
@@ -59,6 +60,7 @@ public record DroneControlPacket(float dx, float dy, float dz, float yaw, float 
             }
             if (!drone.hasBattery()) {
                 drone.setControlled(false);
+                player.sendSystemMessage(Component.literal("Battery dead, replace"));
                 return;
             }
             drone.setControlled(true);

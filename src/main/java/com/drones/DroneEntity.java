@@ -14,7 +14,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -27,8 +26,6 @@ import java.util.UUID;
 import net.minecraft.network.chat.Component;
 
 import com.drones.item.ModItems;
-
-import it.unimi.dsi.fastutil.ints.IntAVLTreeSet;
 
 public class DroneEntity extends PathfinderMob {
 
@@ -78,6 +75,10 @@ public class DroneEntity extends PathfinderMob {
     public ItemStack getInsertedBattery() {
         return insertedBattery;
     }
+    public boolean isBatteryCharged() {
+        if (!hasBattery()) return true;
+        return insertedBattery.getDamageValue()<insertedBattery.getMaxDamage();
+    }
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (level().isClientSide()) return InteractionResult.SUCCESS;
         ItemStack heldItem = player.getItemInHand(hand);
@@ -91,7 +92,7 @@ public class DroneEntity extends PathfinderMob {
             }
             ItemEntity ejected = new ItemEntity(level(), getX(), getY(), getZ(), insertedBattery.copy());
             level().addFreshEntity(ejected);
-            insertedBattery=new ItemStack(ModItems.BATTERY);
+            insertedBattery=ItemStack.EMPTY;
             setBattery(false);
             player.sendSystemMessage(Component.literal("Battery ejected"));
             return InteractionResult.SUCCESS;
@@ -105,13 +106,15 @@ public class DroneEntity extends PathfinderMob {
             insertedBattery.setCount(1);
             heldItem.shrink(1);
             setBattery(true);
-            player.sendSystemMessage(Component.literal("Battery inserted"));
+            int percent = (int)(((float) insertedBattery.getMaxDamage()-insertedBattery.getDamageValue()/insertedBattery.getMaxDamage())*100);
+            player.sendSystemMessage(Component.literal("Battery inserted ("+percent+"% charge)"));
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }
     public void setLinkedController(UUID uuid) {
         entityData.set(LINKED_CONTROLLER, uuid.toString());
+        this.setGlowingTag(true);
     }
     public boolean isControlled() {
         return entityData.get(IS_CONTROLLED);
@@ -123,6 +126,7 @@ public class DroneEntity extends PathfinderMob {
     }
     public void clearLink() {
         entityData.set(LINKED_CONTROLLER, "");
+        this.setGlowingTag(false);
     }
     @Override
     public void tick() {
@@ -136,6 +140,25 @@ public class DroneEntity extends PathfinderMob {
             this.setNoGravity(true);
             this.setDeltaMovement(Vec3.ZERO);
             this.fallDistance = 0;
+            if (!level().isClientSide()&&this.tickCount%20==0) {
+                if (hasBattery()) {
+                    int damage = insertedBattery.getDamageValue();
+                    int max = insertedBattery.getMaxDamage();
+                    if (damage<max) {
+                        insertedBattery.setDamageValue(damage+1);
+                    } else {
+                        setControlled(false);
+                        for (Player p : level().players()) {
+                            if (p instanceof ServerPlayer sp) {
+                                UUID linked = sp.getMainHandItem().get(ModDataComponentTypes.LINKED_DRONE_UUID);
+                                if (linked!=null && linked.equals(this.getUUID())) {
+                                    sp.sendSystemMessage(Component.literal("[Drone] battery dead, replace to continue"));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         } else {
             this.setNoGravity(false);
             this.fallDistance = 0;

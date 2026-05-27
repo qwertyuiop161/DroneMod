@@ -63,7 +63,7 @@ public class DroneControllerItem extends Item {
             if (player.isShiftKeyDown() && stack.get(ModDataComponentTypes.LINKED_DRONE_UUID) != null) {
                 DroneControllerClient.toggleCameraMode();
             }
-            return InteractionResult.SUCCESS;
+            return InteractionResult.CONSUME;
         }
         if (player.isShiftKeyDown()) return InteractionResult.SUCCESS;
         UUID linkedUUID = stack.get(ModDataComponentTypes.LINKED_DRONE_UUID);
@@ -74,7 +74,8 @@ public class DroneControllerItem extends Item {
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.PASS;
         Entity found = serverLevel.getEntity(linkedUUID);
         if (found instanceof DroneEntity drone) {
-            player.sendSystemMessage(Component.literal("Drone at: " + drone.blockPosition()));
+            double dist = Math.round(player.distanceTo(drone)*10.0)/10.0;
+            player.sendSystemMessage(Component.literal("Drone at: " + drone.blockPosition()+", " + dist + " blocks away"));
         } else {
             stack.remove(ModDataComponentTypes.LINKED_DRONE_UUID);
             player.sendSystemMessage(Component.literal("Linked drone not found. Link cleared."));
