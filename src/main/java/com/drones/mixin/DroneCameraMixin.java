@@ -2,7 +2,6 @@ package com.drones.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -11,9 +10,11 @@ import com.drones.DroneControllerClient;
 import com.drones.DroneEntity;
 
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 
 @Mixin(Camera.class)
 public abstract class DroneCameraMixin {
+
     @Shadow
     protected abstract void setRotation(float yRot, float xRot);
 
@@ -22,18 +23,9 @@ public abstract class DroneCameraMixin {
 
     @Inject(at = @At("TAIL"), method = "alignWithEntity")
     private void onAlignWithEntity(float partialTick, CallbackInfo ci) {
-
-        if (!DroneControllerClient.isInCameraMode()) {
-            return;
-
-        }
-
+        if (!DroneControllerClient.isInCameraMode()) return;
         DroneEntity drone = DroneControllerClient.getActiveDrone();
-
-        if (drone == null) {
-            return;
-
-        }
+        if (drone == null) return;
 
         setPosition(drone.getX(), drone.getY() + drone.getEyeHeight(), drone.getZ());
 
@@ -42,6 +34,5 @@ public abstract class DroneCameraMixin {
         } else {
             setRotation(DroneControllerClient.getDroneCameraYaw(), DroneControllerClient.getDroneCameraPitch());
         }
-
     }
 }

@@ -2,6 +2,8 @@ package com.drones;
 
 import java.util.UUID;
 
+import org.jspecify.annotations.NonNull;
+
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -63,6 +65,11 @@ public record DroneControlPacket(float dx, float dy, float dz, float yaw, float 
                 player.sendSystemMessage(Component.literal("Battery dead, replace"));
                 return;
             }
+            if (!drone.isBatteryCharged()) {
+                drone.setControlled(false);
+                player.sendSystemMessage(Component.literal("[Drone] Battery dead, replace it"));
+            }
+            player.sendSystemMessage(Component.literal("debug: setting controlled true"));
             drone.setControlled(true);
             Vec3 movement = new Vec3(packet.dx(), packet.dy(), packet.dz()).scale(0.3);
             Vec3 current = drone.position();
