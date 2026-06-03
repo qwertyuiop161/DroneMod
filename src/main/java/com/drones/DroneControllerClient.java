@@ -16,19 +16,23 @@ public class DroneControllerClient implements ClientModInitializer {
     private static boolean inControlMode = false;
     private static boolean relativeMode = true;
     private static boolean homeWasPressed = false;
-    private static float lockedYaw = 0f;
     private static boolean rWasPressed = false;
     private static boolean inCameraMode = false;
     private static boolean endWasPressed = false;
     private static boolean gWasPressed = false;
     private static boolean cameraModeA = true;
-    private static float lockedCameraYaw = 0f;
-    private static float lockedCameraPitch = 0f;
-    private static DroneEntity activeDrone = null;
+    private static float lockedYaw = 0f;
     private static float droneCameraYaw = 0f;
     private static float droneCameraPitch = 0f;
     private static float lastPlayerYaw = 0f;
     private static float lastPlayerPitch = 0f;
+    private static float lockedCameraYaw = 0f;
+    private static float lockedCameraPitch = 0f;
+    private static double mouseDeltaX = 0;
+    private static double mouseDeltaY = 0;
+    private static double lastMouseX=-1;
+    private static double lastMouseY=-1;
+    private static DroneEntity activeDrone = null;
 
     @Override
     public void onInitializeClient() {
@@ -129,11 +133,21 @@ public class DroneControllerClient implements ClientModInitializer {
                 sendPitch = lockedCameraPitch;
 
             } else if (inCameraMode && !cameraModeA) {
-                sendYaw = currentPlayerYaw;
-                sendPitch = currentPlayerPitch;
-                droneCameraYaw = currentPlayerYaw;
-                droneCameraPitch = currentPlayerPitch;
-                Minecraft.getInstance().player.sendSystemMessage(Component.literal("B yaw: " + currentPlayerYaw + "B pitch: " + currentPlayerPitch));
+                double[] mouseX = new double[1];
+                double[] mouseY = new double[1];
+                GLFW.glfwGetCursorPos(window, mouseX, mouseY);
+                if (lastMouseX >= 0) {
+                    float sensitivity = ((Double) Minecraft.getInstance().options.sensitivity().get()).floatValue() * 0.6f + 0.2f;
+                    float deltaX = (float) (mouseX[0] - lastMouseX) * sensitivity * 0.5f;
+                    float deltaY = (float) (mouseY[0] - lastMouseY) * sensitivity * 0.5f;
+                    droneCameraYaw += deltaX;
+                    droneCameraPitch = Math.clamp(droneCameraPitch + deltaY, -90f, 90f);
+
+                }
+                lastMouseX = mouseX[0];
+                lastMouseY = mouseY[0];
+                sendYaw = droneCameraYaw;
+                sendPitch = droneCameraPitch;
             } else {
                 sendYaw = player.getYRot();
                 sendPitch = player.getXRot();
@@ -248,5 +262,22 @@ public class DroneControllerClient implements ClientModInitializer {
     public static float getDroneCameraPitch() {
         return droneCameraPitch;
 
+    }
+
+    public static void accumulateMouseDelta(double dx, double dy) {
+        mouseDeltaX += dx;
+        mouseDeltaY += dy;
+    }
+
+    public static double consumeMouseDeltaX() {
+        double v = mouseDeltaX;
+        mouseDeltaX = 0;
+        return v;
+    }
+
+    public static double consumeMouseDeltaY() {
+        double v = mouseDeltaY;
+        mouseDeltaY = 0;
+        return v;
     }
 }

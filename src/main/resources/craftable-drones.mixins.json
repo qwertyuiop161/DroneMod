@@ -6,7 +6,8 @@
 		"ExampleMixin"
 	],
 	"client": [
-		"DroneCameraMixin"
+		"DroneCameraMixin",
+		"DroneMouseMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

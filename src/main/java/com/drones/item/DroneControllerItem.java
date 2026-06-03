@@ -75,7 +75,15 @@ public class DroneControllerItem extends Item {
         Entity found = serverLevel.getEntity(linkedUUID);
         if (found instanceof DroneEntity drone) {
             double dist = Math.round(player.distanceTo(drone)*10.0)/10.0;
-            player.sendSystemMessage(Component.literal("Drone at: " + drone.blockPosition()+", " + dist + " blocks away"));
+            String batteryInfo;
+            if (!drone.hasBattery()) {
+                batteryInfo = "No battery";
+            } else {
+                ItemStack bat = drone.getInsertedBattery();
+                int percent = (int)(((float)(bat.getMaxDamage()-bat.getDamageValue())/bat.getMaxDamage())*100);
+                batteryInfo = percent+"% charge";
+            }
+            player.sendSystemMessage(Component.literal("Drone at: " + drone.blockPosition() + ", " + dist + " blocks away | Battery: " + batteryInfo));
         } else {
             stack.remove(ModDataComponentTypes.LINKED_DRONE_UUID);
             player.sendSystemMessage(Component.literal("Linked drone not found. Link cleared."));

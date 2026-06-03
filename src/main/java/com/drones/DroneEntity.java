@@ -76,7 +76,7 @@ public class DroneEntity extends PathfinderMob {
         return insertedBattery;
     }
     public boolean isBatteryCharged() {
-        if (!hasBattery()) return true;
+        if (!hasBattery()) return false;
         return insertedBattery.getDamageValue()<insertedBattery.getMaxDamage();
     }
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
@@ -106,7 +106,7 @@ public class DroneEntity extends PathfinderMob {
             insertedBattery.setCount(1);
             heldItem.shrink(1);
             setBattery(true);
-            int percent = (int)(((float) insertedBattery.getMaxDamage()-insertedBattery.getDamageValue()/insertedBattery.getMaxDamage())*100);
+            int percent = (int)(((float)(insertedBattery.getMaxDamage()-insertedBattery.getDamageValue())/insertedBattery.getMaxDamage())*100);
             player.sendSystemMessage(Component.literal("Battery inserted ("+percent+"% charge)"));
             return InteractionResult.SUCCESS;
         }
@@ -150,9 +150,13 @@ public class DroneEntity extends PathfinderMob {
                         setControlled(false);
                         for (Player p : level().players()) {
                             if (p instanceof ServerPlayer sp) {
-                                UUID linked = sp.getMainHandItem().get(ModDataComponentTypes.LINKED_DRONE_UUID);
-                                if (linked!=null && linked.equals(this.getUUID())) {
-                                    sp.sendSystemMessage(Component.literal("[Drone] battery dead, replace to continue"));
+                                int invSize = sp.getInventory().getContainerSize();
+                                for (int i = 0; i<invSize; i++) {
+                                    UUID linked = sp.getInventory().getItem(i).get(ModDataComponentTypes.LINKED_DRONE_UUID);
+                                    if (linked != null && linked.equals(this.getUUID())) {
+                                        sp.sendSystemMessage(Component.literal("[Drone] Battery dead, replace"));
+                                        break;
+                                    }
                                 }
                             }
                         }

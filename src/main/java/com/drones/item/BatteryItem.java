@@ -15,7 +15,7 @@ public class BatteryItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         int maxDamage = stack.getMaxDamage();
         int damage = stack.getDamageValue();
-        int percent = (int) (((float) (maxDamage-damage)/maxDamage)*100);
+        int percent = (int)(((float)(maxDamage-damage)/maxDamage)*100);
         tooltip.add(Component.literal("Charge: " + percent + "%"));
     }
 }

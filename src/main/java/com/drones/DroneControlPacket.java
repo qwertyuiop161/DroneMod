@@ -68,8 +68,8 @@ public record DroneControlPacket(float dx, float dy, float dz, float yaw, float 
             if (!drone.isBatteryCharged()) {
                 drone.setControlled(false);
                 player.sendSystemMessage(Component.literal("[Drone] Battery dead, replace it"));
+                return;
             }
-            player.sendSystemMessage(Component.literal("debug: setting controlled true"));
             drone.setControlled(true);
             Vec3 movement = new Vec3(packet.dx(), packet.dy(), packet.dz()).scale(0.3);
             Vec3 current = drone.position();
