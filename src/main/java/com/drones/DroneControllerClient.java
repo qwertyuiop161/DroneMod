@@ -2,6 +2,8 @@ package com.drones;
 
 import java.util.UUID;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -14,13 +16,14 @@ import net.minecraft.world.item.ItemStack;
 
 public class DroneControllerClient implements ClientModInitializer {
     private static boolean inControlMode = false;
-    private static boolean relativeMode = true;
-    private static boolean homeWasPressed = false;
-    private static boolean rWasPressed = false;
     private static boolean inCameraMode = false;
-    private static boolean endWasPressed = false;
-    private static boolean gWasPressed = false;
+    private static boolean relativeMode = true;
     private static boolean cameraModeA = true;
+    private static boolean homeWasPressed = false;
+    private static boolean endWasPressed = false;
+    private static boolean rWasPressed = false;
+    private static boolean gWasPressed = false;
+    private static boolean bWasPressed = false;
     private static float lockedYaw = 0f;
     private static float droneCameraYaw = 0f;
     private static float droneCameraPitch = 0f;
@@ -94,6 +97,7 @@ public class DroneControllerClient implements ClientModInitializer {
             gWasPressed = gNowPressed;
             if (!inControlMode && !inCameraMode)
                 return;
+            
             boolean homePressed = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_HOME) == GLFW.GLFW_PRESS;
             if (homePressed && !homeWasPressed) {
                 relativeMode = !relativeMode;

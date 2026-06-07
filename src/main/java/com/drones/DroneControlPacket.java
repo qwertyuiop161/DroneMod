@@ -2,8 +2,6 @@ package com.drones;
 
 import java.util.UUID;
 
-import org.jspecify.annotations.NonNull;
-
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;

@@ -145,7 +145,7 @@ public class DroneEntity extends PathfinderMob {
                     int damage = insertedBattery.getDamageValue();
                     int max = insertedBattery.getMaxDamage();
                     if (damage<max) {
-                        insertedBattery.setDamageValue(damage+1);
+                        insertedBattery.setDamageValue(damage+100);
                     } else {
                         setControlled(false);
                         for (Player p : level().players()) {
