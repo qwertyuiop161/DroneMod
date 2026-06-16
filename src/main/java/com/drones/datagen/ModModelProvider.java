@@ -1,5 +1,6 @@
 package com.drones.datagen;
 
+import com.drones.block.ModBlocks;
 import com.drones.item.ModItems;
 
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
@@ -17,6 +18,7 @@ public class ModModelProvider extends FabricModelProvider{
 
     @Override
     public void generateBlockStateModels(BlockModelGenerators blockModelGenerators) {
+        blockModelGenerators.createTrivialCube(ModBlocks.CHARGING_STATION);
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.util.function.Function;
 import com.drones.item.BatteryItem;
 import com.drones.CraftableDrones;
 import com.drones.ModEntityTypes;
+import com.drones.block.ModBlocks;
 
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.Registry;
@@ -38,6 +39,7 @@ public class ModItems {
             output.accept(DRONE_ITEM);
             output.accept(DRONE_CONTROLLER);
             output.accept(CAMERA);
+            output.accept(Item.byBlock(ModBlocks.CHARGING_STATION));
         });
     }
 

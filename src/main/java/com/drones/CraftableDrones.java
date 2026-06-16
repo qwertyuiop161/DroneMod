@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.drones.block.ModBlocks;
 import com.drones.item.ModItems;
 
 public class CraftableDrones implements ModInitializer {
@@ -18,6 +19,7 @@ public class CraftableDrones implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModItems.registerModItems();
+		ModBlocks.registerModBlocks();
 		ModEntityModelLayers.registerModelLayers();
 		FabricDefaultAttributeRegistry.register(ModEntityTypes.DRONE, DroneEntity.createCubeAttributes());
 		ModDataComponentTypes.register();

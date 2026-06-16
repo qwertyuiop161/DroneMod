@@ -14,6 +14,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -55,7 +56,8 @@ public class DroneEntity extends PathfinderMob {
     public static AttributeSupplier.Builder createCubeAttributes() {
         return PathfinderMob.createMobAttributes()
             .add(Attributes.MAX_HEALTH, 20)
-            .add(Attributes.MOVEMENT_SPEED, 1);
+            .add(Attributes.MOVEMENT_SPEED, 0.3)
+            .add(Attributes.FLYING_SPEED, 0.3);
     }
 
     public boolean isLinked() {
@@ -160,6 +162,7 @@ public class DroneEntity extends PathfinderMob {
                                 }
                             }
                         }
+                        this.setNoAi(false);
                     }
                 }
             }
@@ -211,5 +214,10 @@ public class DroneEntity extends PathfinderMob {
         setBattery(input.getBooleanOr("HasBattery", true));
         input.read("InsertedBattery", ItemStack.CODEC).ifPresent(stack -> insertedBattery=stack);
         entityData.set(LINKED_CONTROLLER, input.getStringOr("LinkedController", ""));
+    }
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new DroneChargeGoal(this));
+        this.goalSelector.addGoal(1, new RandomStrollGoal(this, 0));
     }
 }

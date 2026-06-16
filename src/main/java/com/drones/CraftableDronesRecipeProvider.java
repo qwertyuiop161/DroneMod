@@ -76,7 +76,6 @@ public class CraftableDronesRecipeProvider extends FabricRecipeProvider {
                     .group("drone")
                     .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                     .save(output);
-
             }
         };
     }
