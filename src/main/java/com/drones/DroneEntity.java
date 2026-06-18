@@ -37,6 +37,8 @@ public class DroneEntity extends PathfinderMob {
     private static final EntityDataAccessor<Boolean> HAS_BATTERY = 
         SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.BOOLEAN);
     private ItemStack insertedBattery = new ItemStack(ModItems.BATTERY);
+    private boolean chargingActive = false;
+
     public DroneEntity(Level world) {
         this(ModEntityTypes.DRONE, world);
     }
@@ -167,10 +169,12 @@ public class DroneEntity extends PathfinderMob {
                 }
             }
         } else {
-            this.setNoGravity(false);
-            this.fallDistance = 0;
-            if (!this.onGround()) {
-                this.setDeltaMovement(this.getDeltaMovement().x*0.5, -0.1, this.getDeltaMovement().z*0.5);
+            if (!chargingActive) {
+                this.setNoGravity(false);
+                this.fallDistance = 0;
+                if (!this.onGround()) {
+                    this.setDeltaMovement(this.getDeltaMovement().x*0.5, -0.1, this.getDeltaMovement().z*0.5);
+                }
             }
         }
         if (this.isInWater()) {
@@ -219,5 +223,11 @@ public class DroneEntity extends PathfinderMob {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new DroneChargeGoal(this));
         this.goalSelector.addGoal(1, new RandomStrollGoal(this, 0));
+    }
+    public boolean isChargingActive() {
+        return chargingActive;
+    }
+    public void setChargingActive(boolean active) {
+        this.chargingActive = active;
     }
 }

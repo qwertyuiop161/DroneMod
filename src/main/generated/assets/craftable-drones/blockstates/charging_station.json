@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "craftable-drones:block/charging_station"
+    }
+  }
+}

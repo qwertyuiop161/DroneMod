@@ -3,7 +3,8 @@
 	"package": "com.drones.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"AnvilChargeMixin"
 	],
 	"client": [
 		"DroneCameraMixin",

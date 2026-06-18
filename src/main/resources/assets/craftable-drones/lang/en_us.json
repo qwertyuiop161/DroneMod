@@ -3,5 +3,6 @@
     "item.craftable-drones.propeller": "Propellers",
     "item.craftable-drones.drone_item": "Drone",
     "item.craftable-drones.drone_controller": "Drone controller",
-    "item.craftable-drones.camera": "Camera"
+    "item.craftable-drones.camera": "Camera",
+    "block.craftable-drones.charging_station": "Charging Station"
 }
