@@ -38,6 +38,7 @@ public class DroneEntity extends PathfinderMob {
         SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.BOOLEAN);
     private ItemStack insertedBattery = new ItemStack(ModItems.BATTERY);
     private boolean chargingActive = false;
+    
 
     public DroneEntity(Level world) {
         this(ModEntityTypes.DRONE, world);
