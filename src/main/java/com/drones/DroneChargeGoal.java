@@ -12,10 +12,9 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import com.drones.block.ModBlocks;
-import com.jcraft.jorbis.Block;
 
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -95,6 +94,7 @@ public class DroneChargeGoal extends Goal {
     public void tick() {
         if (targetStation == null) return;
         Level level = drone.level();
+
         drone.setNoGravity(true);
         drone.fallDistance = 0;
 
@@ -105,9 +105,9 @@ public class DroneChargeGoal extends Goal {
         );
 
         recheckTimer++;
-        if (recheckTimer>=40) {
-            recheckTimer=0;
-            if (path!=null && isPathBlocked()) {
+        if (recheckTimer >= 40) {
+            recheckTimer = 0;
+            if (path != null && isPathBlocked()) {
                 computePath();
             }
         }
@@ -126,13 +126,12 @@ public class DroneChargeGoal extends Goal {
         double arriveThreshold = finalApproach ? ARRIVE_DIST : 0.6;
         if (dist > arriveThreshold) {
             Vec3 dir = diff.normalize().scale(Math.min(SPEED, dist));
+            Vec3 currentPos = drone.position();
+            Vec3 attemptedPos = currentPos.add(dir);
+            Vec3 safePos = resolveCollision(currentPos, attemptedPos);
             drone.setDeltaMovement(Vec3.ZERO);
-            drone.setPos(
-                drone.getX() + dir.x,
-                drone.getY() + dir.y,
-                drone.getZ() + dir.z
-            );
-            if (diff.horizontalDistanceSqr() > 0.01) {
+            drone.setPos(safePos.x, safePos.y, safePos.z);
+            if (diff.horizontalDistance() > 0.01) {
                 drone.setYRot((float) Math.toDegrees(Math.atan2(-diff.x, diff.z)));
             }
         } else {
@@ -141,7 +140,13 @@ public class DroneChargeGoal extends Goal {
             } else {
                 drone.setDeltaMovement(Vec3.ZERO);
                 drone.setPos(landPos.x, landPos.y, landPos.z);
-                if (level.hasNeighborSignal(targetStation)) {
+                boolean powered = level.hasNeighborSignal(targetStation);
+                if (!level.isClientSide() && drone.tickCount % 20 == 0) {
+                    for (var p : level.players()) {
+                        p.sendSystemMessage(Component.literal("[Debug] At pad, powered=" + powered));
+                    }
+                }
+                if (powered) {
                     chargeTimer++;
                     if (chargeTimer >= 20) {
                         chargeTimer = 0;
@@ -154,6 +159,7 @@ public class DroneChargeGoal extends Goal {
             }
         }
     }
+
     private boolean isFullyCharged() {
         if (!drone.hasBattery()) return false;
         return drone.getInsertedBattery().getDamageValue() == 0;
@@ -177,6 +183,48 @@ public class DroneChargeGoal extends Goal {
         }
         return false;
     }
+
+    private Vec3 resolveCollision(Vec3 current, Vec3 target) {
+        Level level = drone.level();
+        Vec3 fullMove = target.subtract(current);
+        if (level.noCollision(drone, drone.getBoundingBox().move(fullMove.subtract(current.subtract(current))))) {
+
+        }
+        double dx = target.x - current.x;
+        double dy = target.y - current.y;
+        double dz = target.z - current.z;
+
+        var box = drone.getBoundingBox();
+
+        var boxX = box.move(dx, 0, 0);
+        double resultX = level.noCollision(drone, boxX) ? dx : 0;
+
+        var boxY = box.move(0, dy, 0);
+        double resultY = level.noCollision(drone, boxY) ? dy : 0;
+
+        var boxZ = box.move(0, 0, dz);
+        double resultZ = level.noCollision(drone, boxZ) ? dz : 0;
+
+        var boxCombined = box.move(resultX, resultY, resultZ);
+        if (!level.noCollision(drone, boxCombined)) {
+            if (level.noCollision(drone, box.move(resultX, 0, 0))) {
+                resultY = 0;
+                resultZ = 0;
+            } else if (level.noCollision(drone, box.move(0, resultY, 0))) {
+                resultX = 0;
+                resultZ = 0;
+            } else if (level.noCollision(drone, box.move(0, 0, resultZ))) {
+                resultX = 0;
+                resultY = 0;
+            } else {
+                resultX = 0;
+                resultY = 0;
+                resultZ = 0;
+            }
+        }
+        return new Vec3(current.x + resultX, current.y + resultY, current.z + resultZ);
+    }
+
     private List<BlockPos> aStar(BlockPos start, BlockPos goal) {
         Map<BlockPos, BlockPos> cameFrom = new HashMap<>();
         Map<BlockPos, Double> gScore = new HashMap<>();
