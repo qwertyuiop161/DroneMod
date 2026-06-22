@@ -14,7 +14,6 @@ import java.util.Set;
 import com.drones.block.ModBlocks;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,13 +31,16 @@ public class DroneChargeGoal extends Goal {
 
     private static final double SPEED = 0.25;
     private static final double ARRIVE_DIST = 0.3;
-    private static final int MAX_NODES = 6000;
+    private static final int MAX_NODES = 8000;
     private static final int SEARCH_RANGE = 64;
 
     private static final int[][] DIRS = {
         {0, 1, 0}, {0, -1, 0},
         {0, 0, -1}, {0, 0, 1},
-        {-1, 0, 0}, {1, 0, 0}
+        {-1, 0, 0}, {1, 0, 0},
+        {1, 0, 1}, {1, 0, -1}, {-1, 0, 1}, {-1, 0, -1},
+        {1, 1, 0}, {-1, 1, 0}, {0, 1, 1}, {0, 1, -1},
+        {1, -1, 0}, {-1, -1, 0}, {0, -1, 1}, {0, -1, -1}
     };
 
     public DroneChargeGoal(DroneEntity drone) {
@@ -75,7 +77,7 @@ public class DroneChargeGoal extends Goal {
         if (targetStation != null) {
             drone.setNoAi(false);
             drone.setNoGravity(true);
-            computePath(); 
+            computePath();
         }
     }
 
@@ -111,8 +113,10 @@ public class DroneChargeGoal extends Goal {
                 computePath();
             }
         }
+
         Vec3 waypoint;
         boolean finalApproach;
+
         if (path != null && pathIndex < path.size()) {
             BlockPos wp = path.get(pathIndex);
             waypoint = new Vec3(wp.getX() + 0.5, wp.getY() + 0.5, wp.getZ() + 0.5);
@@ -121,9 +125,11 @@ public class DroneChargeGoal extends Goal {
             waypoint = landPos;
             finalApproach = true;
         }
+
         Vec3 diff = waypoint.subtract(drone.position());
         double dist = diff.length();
-        double arriveThreshold = finalApproach ? ARRIVE_DIST : 0.6;
+        double arriveThreshold = finalApproach ? ARRIVE_DIST : 1.0;
+
         if (dist > arriveThreshold) {
             Vec3 dir = diff.normalize().scale(Math.min(SPEED, dist));
             Vec3 currentPos = drone.position();
@@ -136,16 +142,14 @@ public class DroneChargeGoal extends Goal {
             }
         } else {
             if (!finalApproach) {
+                // Snap exactly onto this waypoint's center before advancing,
+                // so positional drift never accumulates across the path
+                drone.setPos(waypoint.x, waypoint.y, waypoint.z);
                 pathIndex++;
             } else {
                 drone.setDeltaMovement(Vec3.ZERO);
                 drone.setPos(landPos.x, landPos.y, landPos.z);
                 boolean powered = level.hasNeighborSignal(targetStation);
-                if (!level.isClientSide() && drone.tickCount % 20 == 0) {
-                    for (var p : level.players()) {
-                        p.sendSystemMessage(Component.literal("[Debug] At pad, powered=" + powered));
-                    }
-                }
                 if (powered) {
                     chargeTimer++;
                     if (chargeTimer >= 20) {
@@ -164,6 +168,7 @@ public class DroneChargeGoal extends Goal {
         if (!drone.hasBattery()) return false;
         return drone.getInsertedBattery().getDamageValue() == 0;
     }
+
     private void computePath() {
         BlockPos start = drone.blockPosition();
         BlockPos goal = targetStation.above();
@@ -171,9 +176,18 @@ public class DroneChargeGoal extends Goal {
             path = null;
             return;
         }
-        List<BlockPos> result = aStar(start, goal);
-        path = result;
+        path = aStar(start, goal);
         pathIndex = 0;
+
+        if (!drone.level().isClientSide()) {
+            for (var p : drone.level().players()) {
+                p.sendSystemMessage(net.minecraft.network.chat.Component.literal(
+                    "[D] computePath start=" + start + " goal=" + goal +
+                    " startFits=" + fitsAt(start) + " goalFits=" + fitsAt(goal) +
+                    " result=" + (path == null ? "NULL" : path.size() + " wp")
+                ));
+            }
+        }
     }
 
     private boolean isPathBlocked() {
@@ -186,27 +200,17 @@ public class DroneChargeGoal extends Goal {
 
     private Vec3 resolveCollision(Vec3 current, Vec3 target) {
         Level level = drone.level();
-        Vec3 fullMove = target.subtract(current);
-        if (level.noCollision(drone, drone.getBoundingBox().move(fullMove.subtract(current.subtract(current))))) {
-
-        }
         double dx = target.x - current.x;
         double dy = target.y - current.y;
         double dz = target.z - current.z;
 
         var box = drone.getBoundingBox();
 
-        var boxX = box.move(dx, 0, 0);
-        double resultX = level.noCollision(drone, boxX) ? dx : 0;
+        double resultX = level.noCollision(drone, box.move(dx, 0, 0)) ? dx : 0;
+        double resultY = level.noCollision(drone, box.move(0, dy, 0)) ? dy : 0;
+        double resultZ = level.noCollision(drone, box.move(0, 0, dz)) ? dz : 0;
 
-        var boxY = box.move(0, dy, 0);
-        double resultY = level.noCollision(drone, boxY) ? dy : 0;
-
-        var boxZ = box.move(0, 0, dz);
-        double resultZ = level.noCollision(drone, boxZ) ? dz : 0;
-
-        var boxCombined = box.move(resultX, resultY, resultZ);
-        if (!level.noCollision(drone, boxCombined)) {
+        if (!level.noCollision(drone, box.move(resultX, resultY, resultZ))) {
             if (level.noCollision(drone, box.move(resultX, 0, 0))) {
                 resultY = 0;
                 resultZ = 0;
@@ -225,93 +229,148 @@ public class DroneChargeGoal extends Goal {
         return new Vec3(current.x + resultX, current.y + resultY, current.z + resultZ);
     }
 
-    private List<BlockPos> aStar(BlockPos start, BlockPos goal) {
-        Map<BlockPos, BlockPos> cameFrom = new HashMap<>();
-        Map<BlockPos, Double> gScore = new HashMap<>();
-        Set<BlockPos> closed = new HashSet<>();
+    /**
+     * Packs a block position into a single long key. This guarantees correct,
+     * predictable equality/hashing for the A* maps and sets, side-stepping any
+     * possible BlockPos identity quirks. Safe for coordinates well within
+     * +/- 2,000,000 (vastly more than our 64-block search radius needs).
+     */
+    private static long packKey(int x, int y, int z) {
+        long lx = (long) (x + 2_000_000);
+        long ly = (long) (y + 2_000_000);
+        long lz = (long) (z + 2_000_000);
+        return (lx << 42) | (ly << 21) | lz;
+    }
 
-        PriorityQueue<BlockPos> open = new PriorityQueue<>(Comparator.comparingDouble(p -> gScore.getOrDefault(p, Double.MAX_VALUE)+heuristic(p, goal)));
-        gScore.put(start, 0.0);
-        open.add(start);
+    private static long packKey(BlockPos p) {
+        return packKey(p.getX(), p.getY(), p.getZ());
+    }
+
+    private record Node(BlockPos pos, double f) {}
+
+    private List<BlockPos> aStar(BlockPos start, BlockPos goal) {
+        long goalKey = packKey(goal);
+
+        Map<Long, BlockPos> cameFrom = new HashMap<>();
+        Map<Long, Double> gScore = new HashMap<>();
+        Set<Long> closed = new HashSet<>();
+
+        PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingDouble(Node::f));
+
+        long startKey = packKey(start);
+        gScore.put(startKey, 0.0);
+        open.add(new Node(start, heuristic(start, goal)));
+
         int nodesExpanded = 0;
+
         while (!open.isEmpty() && nodesExpanded < MAX_NODES) {
-            BlockPos current = open.poll();
-            if (closed.contains(current)) continue;
-            closed.add(current);
+            Node currentNode = open.poll();
+            BlockPos current = currentNode.pos();
+            long currentKey = packKey(current);
+
+            if (closed.contains(currentKey)) continue;
+            closed.add(currentKey);
             nodesExpanded++;
-            if (current.equals(goal) || current.distSqr(goal) <= 1) {
-                return reconstructPath(cameFrom, current);
+
+            if (currentKey == goalKey) {
+                return reconstructPath(cameFrom, current, startKey);
             }
+
+            double currentG = gScore.getOrDefault(currentKey, Double.MAX_VALUE);
+
             for (int[] d : DIRS) {
                 BlockPos neighbor = current.offset(d[0], d[1], d[2]);
+                long neighborKey = packKey(neighbor);
+
                 if (neighbor.distSqr(start) > (long) SEARCH_RANGE * SEARCH_RANGE) continue;
-                if (closed.contains(neighbor)) continue;
+                if (closed.contains(neighborKey)) continue;
                 if (!fitsAt(neighbor)) continue;
-                double tenativeG = gScore.getOrDefault(current, Double.MAX_VALUE) + 1.0;
-                if (tenativeG < gScore.getOrDefault(neighbor, Double.MAX_VALUE)) {
-                    cameFrom.put(neighbor, current);
-                    gScore.put(neighbor, tenativeG);
-                    open.add(neighbor);
+
+                double stepCost = Math.sqrt(d[0]*d[0] + d[1]*d[1] + d[2]*d[2]);
+                double tentativeG = currentG + stepCost;
+                double existingG = gScore.getOrDefault(neighborKey, Double.MAX_VALUE);
+
+                if (tentativeG < existingG) {
+                    cameFrom.put(neighborKey, current);
+                    gScore.put(neighborKey, tentativeG);
+                    open.add(new Node(neighbor, tentativeG + heuristic(neighbor, goal)));
                 }
             }
         }
+
         return null;
     }
+
     private double heuristic(BlockPos a, BlockPos b) {
         return Math.sqrt(a.distSqr(b));
     }
-    private List<BlockPos> reconstructPath(Map<BlockPos, BlockPos> cameFrom, BlockPos current) {
+
+    private List<BlockPos> reconstructPath(Map<Long, BlockPos> cameFrom, BlockPos current, long startKey) {
         List<BlockPos> result = new ArrayList<>();
         BlockPos node = current;
         while (node != null) {
             result.add(node);
-            node = cameFrom.get(node);
+            long key = packKey(node);
+            if (key == startKey) break;
+            node = cameFrom.get(key);
         }
         Collections.reverse(result);
+        // Drop the start node itself so the drone doesn't loiter there
         if (!result.isEmpty()) result.remove(0);
         return result;
     }
-    private boolean fitsAt(BlockPos center) {
-        Level level = drone.level();
-        int cx = center.getX();
-        int cy = center.getY();
-        int cz = center.getZ();
-        for (int dx = 0; dx <= 1; dx++) {
-            for (int dz = 0; dz <= 1; dz++) {
-                BlockPos check = new BlockPos(cx+dx, cy, cz+dz);
-                BlockState state = level.getBlockState(check);
-                if (!state.isAir() && state.isSolidRender()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+
+    /**
+     * Checks whether the drone's bounding box, if centered at this BlockPos
+     * (block-center horizontally, block-bottom vertically), would collide
+     * with terrain. Anchored using a fixed reference rather than the drone's
+     * live (moving) position, so results are stable regardless of when called.
+     */
+    private boolean fitsAt(BlockPos pos) {
+        double halfWidth = drone.getBbWidth() / 2.0;
+        double height = drone.getBbHeight();
+
+        double minX = pos.getX() + 0.5 - halfWidth;
+        double maxX = pos.getX() + 0.5 + halfWidth;
+        double minZ = pos.getZ() + 0.5 - halfWidth;
+        double maxZ = pos.getZ() + 0.5 + halfWidth;
+        double minY = pos.getY();
+        double maxY = pos.getY() + height;
+
+        net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(minX, minY, minZ, maxX, maxY, maxZ);
+        return drone.level().noCollision(box);
     }
+
     private BlockPos findNearestChargingStation() {
         Level level = drone.level();
         BlockPos dronePosRaw = drone.blockPosition();
         if (dronePosRaw == null) return null;
+
         final int dx0 = dronePosRaw.getX();
         final int dy0 = dronePosRaw.getY();
         final int dz0 = dronePosRaw.getZ();
+
         int range = SEARCH_RANGE;
         BlockPos bestPos = null;
         double bestDist = Double.MAX_VALUE;
         Vec3 dronePosVec = drone.position();
+
         for (int x = -range; x <= range; x++) {
             for (int y = -range; y <= range; y++) {
                 for (int z = -range; z <= range; z++) {
-                    long distSq = (long) x*x + (long) y*y + (long) z*z;
+                    long distSq = (long) x * x + (long) y * y + (long) z * z;
                     if (distSq > (long) range * range) continue;
+
                     BlockPos candidate = new BlockPos(dx0 + x, dy0 + y, dz0 + z);
                     if (!level.getBlockState(candidate).is(ModBlocks.CHARGING_STATION)) continue;
+
                     Vec3 targetVec = new Vec3(
                         candidate.getX() + 0.5,
                         candidate.getY() + 1.0,
                         candidate.getZ() + 0.5
                     );
                     double dist = dronePosVec.distanceTo(targetVec);
-                    if (dist<bestDist) {
+                    if (dist < bestDist) {
                         bestDist = dist;
                         bestPos = candidate;
                     }
