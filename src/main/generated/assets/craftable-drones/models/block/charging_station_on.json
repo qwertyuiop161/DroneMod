@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/orientable",
   "textures": {
-    "top": "craftable-drones:block/top_off",
+    "top": "craftable-drones:block/top_on",
     "bottom": "craftable-drones:block/bottom",
     "front": "craftable-drones:block/front",
     "side": "craftable-drones:block/side"

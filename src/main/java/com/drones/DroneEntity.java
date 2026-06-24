@@ -15,8 +15,11 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
+import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -113,6 +116,15 @@ public class DroneEntity extends PathfinderMob {
             setBattery(true);
             int percent = (int)(((float)(insertedBattery.getMaxDamage()-insertedBattery.getDamageValue())/insertedBattery.getMaxDamage())*100);
             player.sendSystemMessage(Component.literal("Battery inserted ("+percent+"% charge)"));
+            return InteractionResult.SUCCESS;
+        }
+        if (heldItem.is(Items.IRON_INGOT)) {
+            if (this.getHealth()>=this.getMaxHealth()) {
+                return InteractionResult.FAIL;
+            }
+            float healAmount = 8.0f;
+            this.heal(healAmount);
+            heldItem.shrink(1);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;

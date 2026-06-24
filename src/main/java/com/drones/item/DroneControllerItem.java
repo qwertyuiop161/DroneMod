@@ -52,7 +52,6 @@ public class DroneControllerItem extends Item {
         realStack.set(ModDataComponentTypes.LINKED_DRONE_UUID, drone.getUUID());
         drone.setLinkedController(player.getUUID());
         player.sendSystemMessage(Component.literal("Drone linked!"));
-        player.sendSystemMessage(Component.literal("Controls: R = enter/exit control mode | Arrow keys = move | PgUp/PgDn = up/down | HOME = toggle direction mode | END = lock direction | Right-click drone = unlink"));
         return InteractionResult.SUCCESS;
     }
 

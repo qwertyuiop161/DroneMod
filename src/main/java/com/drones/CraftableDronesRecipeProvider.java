@@ -2,6 +2,7 @@ package com.drones;
 
 import java.util.concurrent.CompletableFuture;
 
+import com.drones.block.ModBlocks;
 import com.drones.item.ModItems;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
@@ -75,6 +76,29 @@ public class CraftableDronesRecipeProvider extends FabricRecipeProvider {
                     .define('i', Items.IRON_INGOT)
                     .group("drone")
                     .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                    .save(output);
+                shaped(RecipeCategory.REDSTONE, ModBlocks.CHARGING_STATION.asItem())
+                    .pattern("rir")
+                    .pattern("cbc")
+                    .pattern("RiR")
+                    .define('r', Items.REDSTONE)
+                    .define('i', Items.IRON_INGOT)
+                    .define('c', Items.COPPER_INGOT)
+                    .define('b', ModItems.BATTERY)
+                    .define('R', Items.REDSTONE_BLOCK)
+                    .group("drone")
+                    .unlockedBy(getHasName(Items.IRON_INGOT),has(Items.IRON_INGOT))
+                    .save(output);
+                shaped(RecipeCategory.REDSTONE, ModItems.DRONE_CONTROLLER)
+                    .pattern("iri")
+                    .pattern("cbc")
+                    .pattern("ccc")
+                    .define('r', Items.REDSTONE)
+                    .define('i', Items.IRON_INGOT)
+                    .define('c', Items.COPPER_INGOT)
+                    .define('b', Items.BLACK_DYE)
+                    .group("drone")
+                    .unlockedBy(getHasName(Items.IRON_INGOT),has(Items.IRON_INGOT))
                     .save(output);
             }
         };

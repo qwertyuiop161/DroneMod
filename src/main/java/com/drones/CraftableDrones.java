@@ -20,6 +20,7 @@ public class CraftableDrones implements ModInitializer {
 	public void onInitialize() {
 		ModItems.registerModItems();
 		ModBlocks.registerModBlocks();
+		FreecamClient.register();
 		ModEntityModelLayers.registerModelLayers();
 		FabricDefaultAttributeRegistry.register(ModEntityTypes.DRONE, DroneEntity.createCubeAttributes());
 		ModDataComponentTypes.register();
