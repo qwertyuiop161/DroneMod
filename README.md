@@ -6,11 +6,10 @@
 |---|---|
 | Battery | Copper + Redstone + Iron |
 | Propeller | Iron + Chain |
-| Camera (drone part) | Observer + Iron + Redstone + Glass + Spyglass |
+| Camera | Observer + Iron + Redstone + Glass + Spyglass |
 | Drone | Propeller, Battery, Redstone, Camera, Iron (shaped) |
 | Controller | Iron, Redstone, Copper, Black Dye (shaped) |
 | Charging Station | Redstone, Iron, Copper, Battery, Redstone Block (shaped) |
-| Handheld Camera (freecam tool) | *(ask in-game for current recipe)* |
 
 ## Getting Started
 
