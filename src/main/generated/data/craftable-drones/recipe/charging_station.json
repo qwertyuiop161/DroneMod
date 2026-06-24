@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "group": "drone",
+  "key": {
+    "R": "minecraft:redstone_block",
+    "b": "craftable-drones:battery",
+    "c": "minecraft:copper_ingot",
+    "i": "minecraft:iron_ingot",
+    "r": "minecraft:redstone"
+  },
+  "pattern": [
+    "rir",
+    "cbc",
+    "RiR"
+  ],
+  "result": {
+    "id": "craftable-drones:charging_station"
+  }
+}

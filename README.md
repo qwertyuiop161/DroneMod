@@ -1,4 +1,4 @@
-# Craftable Drones —  Guide
+# Craftable Drones — Player Guide
 
 ## Crafting
 
@@ -51,7 +51,7 @@ While controlling the drone, you can't also be in camera mode at the same time a
 
 ## Handheld Camera (Freecam)
 
-A separate tool from the drone — a standalone item that lets you detach your view from your body entirely, like a free-floating camera.
+The same **Camera** item used to craft a drone doubles as a standalone freecam tool — hold one and you can detach your view from your body entirely, like a free-floating camera.
 
 1. Hold the **Camera** item and **shift + right-click** to activate freecam.
 2. Your body freezes in place (it can't move or turn) and your view splits off into a free-floating camera.
@@ -60,8 +60,9 @@ A separate tool from the drone — a standalone item that lets you detach your v
 5. Shift + right-click again to exit and snap your view back to your body.
 
 **Notes:**
-- You must keep the Camera item in your main hand the whole time — switching items automatically exits freecam.
+- You must keep a Camera item in your main hand the whole time — switching items automatically exits freecam.
 - Your character stays exactly where it was the entire time freecam is active; nothing can move it.
+- Since the Camera item is shared between drone-crafting and freecam, shift-right-clicking *any* Camera item in hand (even one you're saving to craft a drone later) will trigger freecam — just be aware of that if you're holding one for later use.
 
 ## Checking Drone Status
 
@@ -80,7 +81,7 @@ Right-click the air while holding a controller linked to a drone (not sneaking) 
 ## Drone Repair
 
 - If your drone takes damage (from water, collisions, or other hazards), right-click it with an **iron ingot** to heal it.
-- Each ingot restores a set amount of health; you'll get a message if it's already at full health.
+- Each ingot restores 4 HP (2 hearts). You'll get a message if it's already at full health.
 
 ## Hazards
 

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "group": "drone",
+  "key": {
+    "b": "minecraft:black_dye",
+    "c": "minecraft:copper_ingot",
+    "i": "minecraft:iron_ingot",
+    "r": "minecraft:redstone"
+  },
+  "pattern": [
+    "iri",
+    "cbc",
+    "ccc"
+  ],
+  "result": {
+    "id": "craftable-drones:drone_controller"
+  }
+}
