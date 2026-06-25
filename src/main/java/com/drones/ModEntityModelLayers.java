@@ -12,6 +12,6 @@ public class ModEntityModelLayers {
     }
 
     public static void registerModelLayers() {
-        ModelLayerRegistry.registerModelLayer(ModEntityModelLayers.DRONE, DroneEntityModel::getTexturedModelData);
+        ModelLayerRegistry.registerModelLayer(ModEntityModelLayers.DRONE, DroneModel::createBodyLayer);
     }
 }

@@ -1,4 +1,14 @@
-# Craftable Drones — Player Guide
+# Craftable Drones
+
+I built this because I always thought it would be cool to have something you can actually control using a controller in Minecraft — not just a flying mob, but a real little machine you craft, link to a handheld controller, fly around, and watch the world through. That's basically the whole idea behind this mod.
+
+It's a Fabric mod for Minecraft 26.1.2, written against Mojang mappings. Under the hood it's a custom flying entity with its own AI goals (for autonomous charging behavior), a couple of client-side mixins for the camera and input handling, a custom powered block with a proper blockstate/model setup, and a fully custom Blockbench-modeled drone with an animated propeller rig. Recipes, loot tables, and block/item models are all generated through Fabric's datagen pipeline rather than hand-written.
+
+What follows is the player guide — everything you need to know to actually use the thing.
+
+CREDIT TO SUBZERODITTO (modrinth: https://modrinth.com/user/subzeroditto) FOR ALL ITEM TEXTURES!!!!
+
+CREDIT TO JACKSON (personal site: http://armadillomike.dev/) FOR DRONE 3D MODEL!!!!
 
 So you've got a drone mod now. Here's everything you need to actually use it.
 
@@ -12,6 +22,10 @@ So you've got a drone mod now. Here's everything you need to actually use it.
 | Drone | Propeller, Battery, Redstone, Camera, Iron (shaped) |
 | Controller | Iron, Redstone, Copper, Black Dye (shaped) |
 | Charging Station | Redstone, Iron, Copper, Battery, Redstone Block (shaped) |
+
+## What It Looks Like
+
+The drone's got a custom model — body, four propellers, the little connecting struts holding them on. Propellers spin slowly while it's just idling, and kick up to full speed once you take control and start flying it around.
 
 ## Getting Started
 
