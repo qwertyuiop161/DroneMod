@@ -19,7 +19,7 @@ public class ModBlocks {
     public static final Block CHARGING_STATION = register(
         "charging_station",
         ChargingStationBlock::new,
-        BlockBehaviour.Properties.of().strength(2.0f).requiresCorrectToolForDrops(),
+        BlockBehaviour.Properties.of().strength(2.0f),
         true
     );
 

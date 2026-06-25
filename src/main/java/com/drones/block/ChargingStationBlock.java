@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 
 public class ChargingStationBlock extends Block {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -30,7 +31,8 @@ public class ChargingStationBlock extends Block {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, Orientation neighborPos, boolean movedByPiston) {
         if (!level.isClientSide()) {
             boolean powered = level.hasNeighborSignal(pos);
             if (powered != state.getValue(POWERED)) {

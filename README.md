@@ -1,5 +1,7 @@
 # Craftable Drones — Player Guide
 
+So you've got a drone mod now. Here's everything you need to actually use it.
+
 ## Crafting
 
 | Item | Recipe |
@@ -13,82 +15,80 @@
 
 ## Getting Started
 
-1. Craft a **Drone** and place it in the world like a normal entity (spawn egg or summon, depending on your setup).
-2. Craft a **Controller** item.
-3. **Right-click the drone with the Controller** to link them. You'll see a confirmation message and the drone will start glowing while linked.
-4. Right-click the same drone again with the same controller to **unlink**.
+1. Craft a **Drone** and place it in the world.
+2. Craft a **Controller**.
+3. Right-click the drone with the controller to link them. You'll get a message and the drone starts glowing to show it's linked.
+4. Right-click the same drone again with the same controller to unlink it.
 
-A controller can only be linked to one drone at a time, and a drone can only be linked to one controller. If you try to link an already-linked drone or controller, you'll get a failure message.
+Each controller only links to one drone at a time, and vice versa. Try to link something that's already taken and you'll just get a "no" message instead.
 
 ## Battery
 
-- Drones need a battery to fly under player control.
-- **Sneak + empty hand** on the drone → ejects the battery (drops as an item).
-- **Right-click the drone holding a battery** → inserts it.
-- The battery item's tooltip shows its current charge percentage.
-- Battery drains while the drone is being actively controlled. When it dies, the drone loses control and notifies the linked player.
-- **Repairing a battery:** Put it in an anvil with **redstone dust** — works like a normal anvil repair, restoring charge for XP cost.
+Drones need a battery in them to fly under your control.
+
+- Sneak + empty hand on the drone pops the battery out (drops on the ground).
+- Right-click the drone while holding a battery to slot it in.
+- Hover over a battery item to see its charge percentage.
+- The battery drains while you're actively flying the drone. When it dies, you lose control and get a heads-up message.
+- Got a dead battery? Throw it in an anvil with redstone dust — works exactly like a normal anvil repair, costs XP like usual.
 
 ## Controlling the Drone
 
-1. With the controller in hand and a linked drone nearby, press **R** to enter control mode.
-2. **Arrow keys** move the drone horizontally; **Page Up / Page Down** move it vertically (independent of horizontal movement).
-3. **HOME** toggles between relative-direction and fixed-direction movement modes.
-4. **END** locks in your current facing as the fixed direction (only relevant in fixed mode).
-5. Press **R** again to exit control mode.
+1. Controller in hand, drone linked and nearby — press **R** to take control.
+2. Arrow keys move it around horizontally. Page Up / Page Down handle altitude, totally separate from the horizontal movement.
+3. **HOME** swaps between two movement styles: relative to where you're facing, or locked to a fixed direction.
+4. **END** locks in whatever direction you're currently facing (only matters in fixed mode).
+5. **R** again to let go.
 
-While controlling the drone, you can't also be in camera mode at the same time as moving freely — see below for how camera mode works alongside this.
+You can't fly the drone and use camera mode at the same time in the same way — see below for how that actually works together.
 
 ## Camera Mode (Drone POV)
 
-1. **Shift + right-click** the linked drone to enter camera mode. Your character switches to third-person so you can see yourself while watching through the drone.
-2. Press **G** to toggle between two camera styles:
-   - **Mode A** — your head moves freely; the drone's camera view stays locked to a fixed direction.
-   - **Mode B** — your head is locked; moving your mouse steers the drone's camera view.
-3. You can still walk, mine, and place blocks normally while in camera mode — it doesn't restrict your character.
-4. Shift + right-click the drone again to exit camera mode.
-5. If the drone is destroyed while you're viewing through it, camera mode exits automatically.
+1. Shift + right-click the linked drone to jump into its camera. You'll go third-person so you can still see your own character while watching through the drone.
+2. **G** swaps between two styles:
+   - **Mode A** — your head moves freely, the drone's camera stays locked looking one direction.
+   - **Mode B** — your head locks in place, and your mouse now steers the drone's camera instead.
+3. Your character isn't frozen here — you can still walk around, mine, place blocks, whatever, while watching through the drone.
+4. Shift + right-click again to leave camera mode.
+5. If the drone dies while you're watching through it, you get kicked back to your own view automatically.
 
 ## Handheld Camera (Freecam)
 
-The same **Camera** item used to craft a drone doubles as a standalone freecam tool — hold one and you can detach your view from your body entirely, like a free-floating camera.
+Same Camera item you used to build the drone also works as a standalone freecam — no drone needed.
 
-1. Hold the **Camera** item and **shift + right-click** to activate freecam.
-2. Your body freezes in place (it can't move or turn) and your view splits off into a free-floating camera.
-3. Move the camera with **WASD**, look around with the **mouse**, and go up/down with **Space** / **Shift**.
-4. The freecam **ignores all collision** — it flies straight through walls, terrain, anything.
-5. Shift + right-click again to exit and snap your view back to your body.
+1. Hold the Camera item, shift + right-click to turn it on.
+2. Your body locks in place completely — can't move, can't turn — while your view splits off into a floating camera.
+3. WASD flies the camera around, mouse looks, Space/Shift go up and down.
+4. It's true noclip — flies straight through walls and terrain, no collision at all.
+5. Shift + right-click again to snap back into your body.
 
-**Notes:**
-- You must keep a Camera item in your main hand the whole time — switching items automatically exits freecam.
-- Your character stays exactly where it was the entire time freecam is active; nothing can move it.
-- Since the Camera item is shared between drone-crafting and freecam, shift-right-clicking *any* Camera item in hand (even one you're saving to craft a drone later) will trigger freecam — just be aware of that if you're holding one for later use.
+A couple things worth knowing: you have to keep the camera in your main hand the whole time, switching items kicks you out of freecam automatically. And since it's the same item used for crafting, shift-right-clicking a camera you're saving for later will also trigger freecam — not a bug, just how it's wired.
 
-## Checking Drone Status
+## Checking on Your Drone
 
-Right-click the air while holding a controller linked to a drone (not sneaking) to get a status readout: the drone's coordinates, distance from you, and current battery percentage.
+Right-click the air (not sneaking) while holding a controller that's linked to a drone, and you'll get its coordinates, how far away it is, and its battery percentage.
 
 ## Charging Station
 
-- Place a **Charging Station** block and power it with redstone (lever, torch, block, etc.) — it must stay powered to charge.
-- When a drone's battery dies, it will automatically search for the nearest powered charging station within 64 blocks and fly there to recharge.
-- Charging rate: roughly 1% per second while docked and the station is powered.
-- If you eject the battery while it's mid-charge, it keeps whatever charge it had gained.
-- If no charging station is in range when the battery dies, the drone just sits where it died — bring it a freshly charged battery manually, or push/carry it within range of a station.
+- Place the block, then power it with a lever, torch, redstone block, whatever you've got — it needs to stay powered to actually charge anything.
+- **One thing to watch for:** the block only checks for power when something around it actually changes. If you place the station right next to a redstone block (or anything already powered before the station went down), it won't notice — it's only listening for changes after it's placed. Toggle the power source off and back on once after placing, and it'll pick it up fine from then on.
+- When a drone's battery dies, it'll automatically hunt for the nearest powered station within 64 blocks and fly over to dock.
+- Charges at roughly 1% a second while it's sitting there powered.
+- Pull the battery out mid-charge and it keeps whatever progress it made.
+- No station in range when the battery dies? The drone just sits there dead. You'll need to manually swap in a charged battery, or get it within range of a station somehow.
 
-**Note:** the drone currently flies in a fairly direct line toward the charging station and will slide along obstacles rather than always routing cleverly around them — keep a relatively clear path between your drone's usual flying area and your charging station for best results.
+One honest caveat: right now the drone flies in a pretty direct line to the station and just slides along anything it bumps into rather than properly routing around obstacles. Keep the path between your drone's usual airspace and the charging station reasonably clear.
 
 ## Drone Repair
 
-- If your drone takes damage (from water, collisions, or other hazards), right-click it with an **iron ingot** to heal it.
-- Each ingot restores 4 HP (2 hearts). You'll get a message if it's already at full health.
+Drone took some damage? Right-click it with an iron ingot to patch it up — 4 HP (2 hearts) per ingot. It'll tell you if it's already full.
 
 ## Hazards
 
-- **Water** will damage and eventually destroy an uncontrolled or controlled drone over roughly 7 seconds of continuous submersion — keep it away from water.
-- A destroyed drone drops its battery (if it had one) regardless of cause of death.
+- Water is bad news — a drone sitting in water for about 7 seconds straight will die.
+- Whenever a drone dies, it drops its battery (if it has one), no matter what killed it.
 
-## Quick Reference: Keybinds
+## Quick Reference
 
 | Key | Action |
 |---|---|
