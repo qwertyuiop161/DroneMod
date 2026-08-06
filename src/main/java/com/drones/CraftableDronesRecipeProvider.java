@@ -13,6 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -96,7 +97,7 @@ public class CraftableDronesRecipeProvider extends FabricRecipeProvider {
                     .define('r', Items.REDSTONE)
                     .define('i', Items.IRON_INGOT)
                     .define('c', Items.COPPER_INGOT)
-                    .define('b', Items.BLACK_DYE)
+                    .define('b', Items.DYE.pick(DyeColor.BLACK))
                     .group("drone")
                     .unlockedBy(getHasName(Items.IRON_INGOT),has(Items.IRON_INGOT))
                     .save(output);

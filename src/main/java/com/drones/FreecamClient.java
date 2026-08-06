@@ -29,7 +29,7 @@ public class FreecamClient {
                 exitFreecam();
                 return;
             }
-            if (client.screen != null)
+            if (client.gui.screen() != null)
                 return;
 
             if (!player.getMainHandItem().is(ModItems.CAMERA)) {

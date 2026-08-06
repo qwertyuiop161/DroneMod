@@ -42,7 +42,7 @@ public class DroneControllerClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.level == null)
                 return;
-            if (client.screen != null)
+            if (client.gui.screen() != null)
                 return;
             LocalPlayer player = client.player;
             float currentPlayerYaw = player.getYRot();
