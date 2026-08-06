@@ -2,7 +2,7 @@
 
 I built this because I always thought it would be cool to have something you can actually control using a controller in Minecraft — not just a flying mob, but a real little machine you craft, link to a handheld controller, fly around, and watch the world through. That's basically the whole idea behind this mod.
 
-It's a Fabric mod for Minecraft 26.1.2, written against Mojang mappings. Under the hood it's a custom flying entity with its own AI goals (for autonomous charging behavior), a couple of client-side mixins for the camera and input handling, a custom powered block with a proper blockstate/model setup, and a fully custom Blockbench-modeled drone with an animated propeller rig. Recipes, loot tables, and block/item models are all generated through Fabric's datagen pipeline rather than hand-written.
+It's a Fabric mod for Minecraft 26.2, written against Mojang mappings. Under the hood it's a custom flying entity with its own AI goals (for autonomous charging behavior), a couple of client-side mixins for the camera and input handling, a custom powered block with a proper blockstate/model setup, and a fully custom Blockbench-modeled drone with an animated propeller rig. Recipes, loot tables, and block/item models are all generated through Fabric's datagen pipeline rather than hand-written.
 
 What follows is the player guide — everything you need to know to actually use the thing.
 
